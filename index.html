@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Algorithm Visualizer</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <h1>Algorithm Visualizer</h1>
@@ -13,6 +14,13 @@
     <option value="binary">Binary Search</option>
     <option value="prefix">Prefix Sums</option>
     <option value="twoptr">Two Pointers</option>
+    <option value="bubble">Bubble Sort</option>
+    <option value="selection">Selection Sort</option>
+    <option value="insertion">Insertion Sort</option>
+    <option value="merge">Merge Sort</option>
+    <option value="quick">Quick Sort</option>
+    <option value="heap">Heap Sort</option>
+    <option value="bogo">Bogo Sort</option>
   </select>
 
   <br><br>
@@ -23,7 +31,15 @@
   <button id="start">Start</button>
   <button id="step">Step</button>
 
-  <div id="visual"></div>
+  <div id="visual">
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div id="details">
+    <h2>Algorithm Details</h2>
+    <pre id="code"></pre>
+    <p id="complexity"></p>
+  </div>
 
   <script src="main.js"></script>
 </body>
