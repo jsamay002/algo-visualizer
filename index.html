@@ -9,25 +9,44 @@
 <body>
   <h1>Algorithm Visualizer</h1>
 
-  <label for="algo">Algorithm:</label>
-  <select id="algo">
-    <option value="bubble">Bubble Sort</option>
-    <option value="selection">Selection Sort</option>
-    <option value="insertion">Insertion Sort</option>
-  </select>
+  <!-- Controls Panel -->
+  <div class="controls">
+    <!-- Algorithm Selector -->
+    <div class="control-group">
+      <label for="algo">Algorithm:</label>
+      <select id="algo">
+        <option value="bubble">Bubble Sort</option>
+        <option value="selection">Selection Sort</option>
+        <option value="insertion">Insertion Sort</option>
+      </select>
+    </div>
 
-  <br><br>
+    <!-- Array Input -->
+    <div class="control-group">
+      <label for="array">Array:</label>
+      <input id="array" placeholder="e.g. 5, 2, 8, 1, 4" />
+    </div>
 
-  <label for="array">Array:</label>
-  <input id="array" placeholder="e.g. 1, 3, 5, 7, 9" />
+    <!-- Buttons -->
+    <div class="control-group buttons">
+      <button id="start">Start</button>
+      <button id="step">Step</button>
+      <button id="autorun">Auto-Run</button>
+    </div>
 
-  <button id="start">Start</button>
-  <button id="step">Step</button>
+    <!-- Speed Input -->
+    <div class="control-group">
+      <label for="speed">Speed (ms):</label>
+      <input type="number" id="speed" value="500" min="50" step="50"/>
+    </div>
+  </div>
 
+  <!-- Chart Container -->
   <div id="visual">
     <canvas id="chart"></canvas>
   </div>
 
+  <!-- Algorithm Details -->
   <div id="details">
     <h2>Algorithm Details</h2>
     <pre id="code"></pre>
