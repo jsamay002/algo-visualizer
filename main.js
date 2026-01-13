@@ -1,6 +1,7 @@
 let chart;
 let algoState = {};
 let currentAlgo = null;
+let autoRunInterval = null; // Variable to store the Auto-Run interval
 
 // ----------------- ALGORITHMS -----------------
 const algorithms = {
@@ -121,6 +122,36 @@ function performStep() {
   if (algo && algo.step) algo.step();
 }
 
+// ----------------- AUTO-RUN -----------------
+function startAutoRun() {
+  if (!currentAlgo) {
+    alert("Please initialize an algorithm first!");
+    return;
+  }
+
+  const speedInput = document.getElementById("speed");
+  const speed = parseInt(speedInput.value) || 500; // Default to 500ms if invalid
+
+  // Clear any existing Auto-Run interval
+  stopAutoRun();
+
+  // Start a new interval for Auto-Run
+  autoRunInterval = setInterval(() => {
+    if (algoState.sorted) {
+      stopAutoRun(); // Stop Auto-Run when sorting is complete
+    } else {
+      performStep(); // Perform a step of the algorithm
+    }
+  }, speed);
+}
+
+function stopAutoRun() {
+  if (autoRunInterval) {
+    clearInterval(autoRunInterval);
+    autoRunInterval = null;
+  }
+}
+
 // ----------------- BUBBLE SORT -----------------
 function bubbleSortStep() {
   const { array } = algoState;
@@ -207,6 +238,7 @@ function updateVisualizer() {
 // ----------------- EVENTS -----------------
 document.getElementById("start").addEventListener("click", initializeAlgo);
 document.getElementById("step").addEventListener("click", performStep);
+document.getElementById("autorun").addEventListener("click", startAutoRun); // Add Auto-Run event listener
 document.getElementById("algo").addEventListener("change", e => {
   currentAlgo = e.target.value;
   displayAlgorithmDetails(currentAlgo);

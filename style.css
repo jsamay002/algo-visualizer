@@ -1,4 +1,4 @@
-/* Global Styles */
+/* --- Global Styles --- */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
@@ -7,44 +7,64 @@ body {
   margin: 0;
 }
 
-/* Headings */
 h1 {
   text-align: center;
-  margin-bottom: 30px;
   color: #222;
+  margin-bottom: 25px;
 }
 
-/* Labels and Inputs */
-label {
-  font-weight: bold;
-  margin-right: 10px;
+/* --- Controls Panel --- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 20px;
 }
 
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-group.buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Inputs, selects, and buttons */
 input, select, button {
-  padding: 8px 12px;
-  margin: 5px 0;
+  padding: 8px 14px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
   font-size: 14px;
+  transition: all 0.2s ease;
 }
 
-/* Buttons */
+/* Buttons styling */
 button {
   cursor: pointer;
   background-color: #4CAF50;
   color: white;
   border: none;
-  transition: background 0.2s;
+  min-width: 90px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 button:hover {
   background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
 }
 
-/* Visualizer Container */
+/* --- Visualizer Container --- */
 #visual {
   margin-top: 20px;
-  min-height: 150px;
+  min-height: 200px;
   border: 2px solid #ccc;
   border-radius: 8px;
   background-color: #fff;
@@ -52,17 +72,6 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: monospace;
-  font-size: 16px;
-  overflow-x: auto;
-}
-
-#visual {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  margin-top: 20px;
 }
 
 canvas {
@@ -70,24 +79,37 @@ canvas {
   max-height: 100%;
 }
 
+/* --- Algorithm Details --- */
 #details {
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 pre {
   background-color: #f4f4f4;
-  padding: 10px;
+  padding: 12px;
   border-radius: 5px;
   overflow-x: auto;
 }
 
 p {
   font-weight: bold;
+  margin-top: 8px;
 }
-/* Responsive tweaks */
+
+/* --- Responsive Design --- */
 @media (max-width: 600px) {
-  body {
-    padding: 10px;
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .control-group {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .control-group.buttons {
+    justify-content: center;
   }
 
   input, select, button {
