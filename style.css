@@ -695,6 +695,18 @@ body {
   border-radius: 2px;
 }
 
+/* --- Concept Card --- */
+.concept-card {
+  border-left: 3px solid var(--teal);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.04), var(--bg-card));
+}
+
+.concept-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
 /* --- Visualization Area --- */
 .visualization-area {
   min-height: 350px;

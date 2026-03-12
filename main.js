@@ -21,6 +21,7 @@ const algorithmData = {
   name: 'Binary Search',
   category: 'Searching & Arrays',
   description: 'Efficiently finds a target value in a sorted array by repeatedly dividing the search interval in half. Essential for USACO Bronze/Silver problems involving monotonic functions and search spaces.',
+  concept: 'Keep two pointers, lo and hi, defining the search range. Compute mid = (lo+hi)/2. If arr[mid] equals the target, done. If arr[mid] < target, the answer must be in the right half, so set lo = mid+1. Otherwise set hi = mid-1. Each step halves the search space, giving O(log n) time.',
   complexity: { best: 'O(1)', average: 'O(log n)', worst: 'O(log n)', space: 'O(1)' },
   defaultInput: '1,3,5,7,9,11,13,15,17,19',
   defaultTarget: 13,
@@ -71,6 +72,11 @@ const algorithmData = {
       state.done = true;
       return { done: true, description: `${state.target} not found in the array.` };
     }
+    // First: if we had a previous mid, eliminate it now (delayed elimination for animation)
+    if (state.prevEliminate) {
+      state.prevEliminate.forEach(i => state.eliminated.add(i));
+      state.prevEliminate = null;
+    }
     const mid = Math.floor((state.lo + state.hi) / 2);
     state.mid = mid;
     if (state.array[mid] === state.target) {
@@ -78,11 +84,16 @@ const algorithmData = {
       state.done = true;
       return { done: true, description: `Found ${state.target} at index ${mid}!` };
     } else if (state.array[mid] < state.target) {
-      for (let i = state.lo; i <= mid; i++) state.eliminated.add(i);
+      // Queue elimination for NEXT step so mid highlights this step
+      const toEliminate = [];
+      for (let i = state.lo; i <= mid; i++) toEliminate.push(i);
+      state.prevEliminate = toEliminate;
       state.lo = mid + 1;
       return { done: false, description: `arr[${mid}] = ${state.array[mid]} < ${state.target}. Search right half: lo = ${mid + 1}` };
     } else {
-      for (let i = mid; i <= state.hi; i++) state.eliminated.add(i);
+      const toEliminate = [];
+      for (let i = mid; i <= state.hi; i++) toEliminate.push(i);
+      state.prevEliminate = toEliminate;
       state.hi = mid - 1;
       return { done: false, description: `arr[${mid}] = ${state.array[mid]} > ${state.target}. Search left half: hi = ${mid - 1}` };
     }
@@ -96,6 +107,7 @@ const algorithmData = {
   name: 'Two Pointers',
   category: 'Searching & Arrays',
   description: 'Uses two pointers moving toward each other to find pairs in a sorted array that sum to a target value. A common and efficient technique in USACO Silver for pair-finding and partitioning problems.',
+  concept: 'Place one pointer at the start (left) and one at the end (right) of a sorted array. If their sum is too small, move left forward to increase it. If too large, move right backward. Since the array is sorted, this guarantees you check all viable pairs in O(n) instead of O(n²).',
   complexity: { best: 'O(n)', average: 'O(n)', worst: 'O(n)', space: 'O(1)' },
   defaultInput: '1,2,3,4,5,6,7,8,9',
   defaultTarget: 10,
@@ -170,6 +182,7 @@ const algorithmData = {
   name: 'Prefix Sums',
   category: 'Searching & Arrays',
   description: 'Precomputes cumulative sums so that any range sum query can be answered in O(1). A fundamental technique in USACO Silver used for range queries, subarray sums, and 2D grid problems.',
+  concept: 'Build an array where prefix[i] = sum of arr[0..i-1]. Then sum(l..r) = prefix[r+1] - prefix[l]. The O(n) preprocessing cost pays off when you need many range queries, each answerable in O(1). Extends to 2D grids for rectangle sum queries.',
   complexity: { best: 'O(n)', average: 'O(n)', worst: 'O(n)', space: 'O(n)' },
   defaultInput: '3,1,4,1,5,9,2,6',
   hasTarget: false,
@@ -234,6 +247,7 @@ static int rangeSum(int[] prefix, int l, int r) {
   name: 'Sliding Window',
   category: 'Searching & Arrays',
   description: 'Maintains a window of elements sliding across the array to find optimal subarrays. Key technique for USACO Silver/Gold problems involving contiguous subarrays with constraints.',
+  concept: 'Instead of recalculating the sum for every possible subarray (O(nk)), maintain a running sum. When the window slides right by one, add the new element and subtract the element that just left. This keeps each step O(1), making the total O(n).',
   complexity: { best: 'O(n)', average: 'O(n)', worst: 'O(n)', space: 'O(1)' },
   defaultInput: '2,1,5,1,3,2,4,3',
   hasTarget: false,
@@ -311,6 +325,7 @@ static int rangeSum(int[] prefix, int l, int r) {
   name: 'Bubble Sort',
   category: 'Sorting Algorithms',
   description: 'Repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. Simple but O(n²) - useful for understanding sorting fundamentals and inversion counting.',
+  concept: 'Each pass compares every adjacent pair and swaps if out of order. After pass k, the k-th largest element is in its final position. The largest unsorted element "bubbles up" to the end each pass. Stops early if no swaps occur (already sorted).',
   complexity: { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
   defaultInput: '64,34,25,12,22,11,90',
   hasTarget: false,
@@ -391,6 +406,7 @@ static int rangeSum(int[] prefix, int l, int r) {
   name: 'Selection Sort',
   category: 'Sorting Algorithms',
   description: 'Finds the minimum element from the unsorted portion and places it at the beginning. Demonstrates the selection principle that appears in many competitive programming greedy algorithms.',
+  concept: 'Divide the array into sorted (left) and unsorted (right) portions. Repeatedly find the minimum in the unsorted portion and swap it to the front. Always does exactly n(n-1)/2 comparisons regardless of input.',
   complexity: { best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
   defaultInput: '64,25,12,22,11,90,34',
   hasTarget: false,
@@ -464,6 +480,7 @@ static int rangeSum(int[] prefix, int l, int r) {
   name: 'Insertion Sort',
   category: 'Sorting Algorithms',
   description: 'Builds the sorted array one element at a time by inserting each new element into its correct position. Efficient for small or nearly-sorted arrays - often used as base case in hybrid sorts.',
+  concept: 'Like sorting a hand of cards: pick the next unsorted element, shift all larger sorted elements one position right, then insert it into the gap. O(n) on nearly-sorted data, making it practical as a base case for merge sort or quick sort on small subarrays.',
   complexity: { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)', space: 'O(1)' },
   defaultInput: '12,11,13,5,6,7',
   hasTarget: false,
@@ -531,6 +548,7 @@ static int rangeSum(int[] prefix, int l, int r) {
   name: 'Merge Sort',
   category: 'Sorting Algorithms',
   description: 'Divides the array into halves, recursively sorts them, and merges the sorted halves. Guaranteed O(n log n) - important for USACO problems requiring stable, efficient sorting and inversion counting.',
+  concept: 'Divide the array in half, recursively sort both halves, then merge them by comparing the heads of each half and taking the smaller. Since merging two sorted halves is O(n) and we have O(log n) levels of recursion, total work is O(n log n). It is stable and predictable.',
   complexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n log n)', space: 'O(n)' },
   defaultInput: '38,27,43,3,9,82,10',
   hasTarget: false,
@@ -634,6 +652,7 @@ static void mergeSort(int[] arr, int l, int r) {
   name: 'Quick Sort',
   category: 'Sorting Algorithms',
   description: 'Selects a pivot element and partitions the array so that smaller elements go left and larger go right, then recursively sorts. Average O(n log n) - the most widely used sorting algorithm in practice.',
+  concept: 'Pick a pivot (here we use the last element). Partition: walk through the array, swapping elements <= pivot to the left side. Place pivot in its final position. Now everything left is smaller, everything right is larger. Recurse on both sides. Average O(n log n), worst O(n²) with bad pivot choices.',
   complexity: { best: 'O(n log n)', average: 'O(n log n)', worst: 'O(n²)', space: 'O(log n)' },
   defaultInput: '10,80,30,90,40,50,70',
   hasTarget: false,
@@ -746,6 +765,7 @@ static void quickSort(int[] arr, int lo, int hi) {
   name: 'Breadth-First Search (BFS)',
   category: 'Graph Algorithms',
   description: 'Explores a graph level by level using a queue. Finds shortest paths in unweighted graphs. Fundamental USACO Silver/Gold technique used for flood fill, shortest path, and connected components.',
+  concept: 'Start from a source node, add it to a queue. Repeatedly dequeue the front node, visit it, and enqueue all its unvisited neighbors. This explores nodes in order of distance from the source, guaranteeing shortest paths in unweighted graphs. Think of it as a "ripple" expanding outward.',
   complexity: { best: 'O(V + E)', average: 'O(V + E)', worst: 'O(V + E)', space: 'O(V)' },
   isGraph: true,
   defaultInput: '',
@@ -851,6 +871,7 @@ def bfs(adj, start, n):
   name: 'Depth-First Search (DFS)',
   category: 'Graph Algorithms',
   description: 'Explores a graph by going as deep as possible along each branch before backtracking. Core technique for USACO problems involving connected components, cycle detection, tree traversal, and flood fill.',
+  concept: 'Start at a node, mark it visited, then immediately recurse on an unvisited neighbor. Go as deep as possible before backtracking. Uses a stack (explicit or via recursion). Great for finding connected components, detecting cycles, and tree problems. Visits every node and edge exactly once: O(V+E).',
   complexity: { best: 'O(V + E)', average: 'O(V + E)', worst: 'O(V + E)', space: 'O(V)' },
   isGraph: true,
   defaultInput: '',
@@ -931,6 +952,7 @@ def bfs(adj, start, n):
   name: "Dijkstra's Algorithm",
   category: 'Graph Algorithms',
   description: 'Finds shortest paths from a source vertex to all other vertices in a weighted graph with non-negative edge weights. Critical for USACO Gold shortest path problems.',
+  concept: 'Maintain a distance array (initially infinity, source = 0) and a priority queue. Always process the unfinalized node with the smallest distance. For each neighbor, check if going through the current node is shorter (relaxation). Uses a min-heap for O((V+E) log V). Only works with non-negative edge weights.',
   complexity: { best: 'O((V+E) log V)', average: 'O((V+E) log V)', worst: 'O((V+E) log V)', space: 'O(V)' },
   isGraph: true,
   defaultInput: '',
@@ -1047,6 +1069,7 @@ def dijkstra(adj, start, n):
   name: 'Topological Sort',
   category: 'Graph Algorithms',
   description: "Orders vertices of a directed acyclic graph (DAG) such that for every directed edge u→v, u comes before v. Used in USACO for dependency ordering, scheduling problems, and DP on DAGs (Kahn's Algorithm).",
+  concept: "Kahn's Algorithm: compute in-degree for every node. Enqueue all nodes with in-degree 0. Dequeue a node, add it to the result, and decrement in-degrees of its neighbors. Any neighbor reaching in-degree 0 gets enqueued. If all nodes are processed, you have a valid topological order. If not, the graph has a cycle.",
   complexity: { best: 'O(V + E)', average: 'O(V + E)', worst: 'O(V + E)', space: 'O(V)' },
   isGraph: true,
   defaultInput: '',
@@ -1153,6 +1176,7 @@ def topological_sort(adj, n):
   name: 'Union-Find (DSU)',
   category: 'Advanced Techniques',
   description: 'Disjoint Set Union with path compression and union by rank. Tracks connected components efficiently. Essential for USACO Gold problems involving grouping, connectivity, and minimum spanning trees.',
+  concept: 'Each element points to a parent, forming trees. find(x) follows parent pointers to the root, and flattens the path (path compression). union(x,y) links the root of the smaller tree under the larger (union by rank). Both optimizations together give nearly O(1) amortized per operation — specifically O(α(n)), the inverse Ackermann function.',
   complexity: { best: 'O(α(n))', average: 'O(α(n))', worst: 'O(α(n))', space: 'O(n)' },
   isDSU: true,
   defaultInput: '',
@@ -1269,6 +1293,7 @@ def topological_sort(adj, n):
   name: 'DP: Longest Increasing Subsequence',
   category: 'Advanced Techniques',
   description: 'Finds the length of the longest strictly increasing subsequence using dynamic programming. A classic DP problem that appears frequently in USACO Gold and demonstrates optimal substructure and overlapping subproblems.',
+  concept: 'Define dp[i] = length of the longest increasing subsequence ending at index i. For each i, check all j < i: if arr[j] < arr[i], then dp[i] = max(dp[i], dp[j]+1). The answer is max(dp). This O(n²) approach demonstrates the DP pattern of building solutions from smaller subproblems. An O(n log n) version exists using binary search on a "tails" array.',
   complexity: { best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)', space: 'O(n)' },
   defaultInput: '10,22,9,33,21,50,41,60',
   hasTarget: false,
@@ -1606,6 +1631,16 @@ function switchAlgorithm(key) {
   document.getElementById('complexWorst').textContent = algo.complexity.worst;
   document.getElementById('complexSpace').textContent = algo.complexity.space;
 
+  // Show concept
+  const conceptCard = document.getElementById('conceptCard');
+  const conceptText = document.getElementById('conceptText');
+  if (algo.concept) {
+    conceptCard.style.display = '';
+    conceptText.textContent = algo.concept;
+  } else {
+    conceptCard.style.display = 'none';
+  }
+
   // Update code with line numbers
   renderCodeBlock('pythonCode', algo.python);
   renderCodeBlock('cppCode', algo.cpp);
@@ -1767,6 +1802,13 @@ function clearVisualization() {
   document.getElementById('arrayContainer').style.display = 'none';
   document.getElementById('graphContainer').innerHTML = '';
   document.getElementById('graphContainer').style.display = 'none';
+  barElements = [];
+  secondaryCells = [];
+  lastArrayLength = 0;
+  lastAlgoForBars = '';
+  // Clear code explanation
+  const explEl = document.getElementById('codeExplanation');
+  if (explEl) { explEl.classList.remove('visible'); explEl.textContent = ''; }
 }
 
 // ============================================================
@@ -1828,141 +1870,167 @@ function renderVisualization() {
   }
 }
 
-// --- Array Bar Rendering ---
+// --- Array Bar Rendering (in-place updates for smooth CSS transitions) ---
+let barElements = []; // Cached bar DOM elements for in-place updates
+let secondaryCells = []; // Cached secondary cells
+let lastArrayLength = 0;
+let lastAlgoForBars = '';
+
 function renderArrayBars() {
   const container = document.getElementById('arrayContainer');
   container.style.display = 'flex';
   document.getElementById('graphContainer').style.display = 'none';
-  container.innerHTML = '';
 
-  const algo = algorithmData[currentAlgo];
   const state = algoState;
   const arr = state.array;
   const maxVal = Math.max(...arr, 1);
   const maxBarHeight = 250;
-
-  // Check if we need secondary display (prefix sums, DP)
   const needsSecondary = currentAlgo === 'prefix-sums' || currentAlgo === 'dp-lis';
-  if (needsSecondary) {
-    container.classList.add('with-secondary');
-  } else {
-    container.classList.remove('with-secondary');
+
+  // Rebuild structure only if array length changed or algorithm switched
+  const needsRebuild = arr.length !== lastArrayLength || currentAlgo !== lastAlgoForBars;
+
+  if (needsRebuild) {
+    container.innerHTML = '';
+    barElements = [];
+    secondaryCells = [];
+    lastArrayLength = arr.length;
+    lastAlgoForBars = currentAlgo;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'vis-wrapper';
+    wrapper.id = 'visWrapper';
+
+    const primary = document.createElement('div');
+    primary.className = 'array-container' + (needsSecondary ? ' with-secondary' : '');
+    primary.id = 'primaryBars';
+
+    arr.forEach((val, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'array-bar';
+
+      const valueEl = document.createElement('div');
+      valueEl.className = 'bar-value';
+      valueEl.textContent = val;
+
+      const fillEl = document.createElement('div');
+      fillEl.className = 'bar-fill';
+      fillEl.style.height = Math.max(20, (val / maxVal) * maxBarHeight) + 'px';
+
+      const indexEl = document.createElement('div');
+      indexEl.className = 'bar-index';
+      indexEl.textContent = i;
+
+      bar.appendChild(valueEl);
+      bar.appendChild(fillEl);
+      bar.appendChild(indexEl);
+      primary.appendChild(bar);
+      barElements.push({ bar, valueEl, fillEl, indexEl });
+    });
+
+    wrapper.appendChild(primary);
+
+    // Build secondary containers
+    if (currentAlgo === 'prefix-sums' && state.prefix) {
+      const label = document.createElement('div');
+      label.className = 'secondary-label';
+      label.textContent = 'Prefix Sum Array';
+      wrapper.appendChild(label);
+      const secondary = document.createElement('div');
+      secondary.className = 'secondary-array-container';
+      secondary.id = 'secondaryContainer';
+      state.prefix.forEach((_, i) => {
+        if (i > state.array.length) return;
+        const cell = document.createElement('div');
+        cell.className = 'array-cell';
+        const cellVal = document.createElement('div');
+        cellVal.className = 'cell-value';
+        const cellLabel = document.createElement('div');
+        cellLabel.className = 'cell-label';
+        cellLabel.textContent = `p[${i}]`;
+        cell.appendChild(cellVal);
+        cell.appendChild(cellLabel);
+        secondary.appendChild(cell);
+        secondaryCells.push({ cell, cellVal });
+      });
+      wrapper.appendChild(secondary);
+    }
+
+    if (currentAlgo === 'dp-lis' && state.dp) {
+      const label = document.createElement('div');
+      label.className = 'secondary-label';
+      label.textContent = 'DP Array (LIS length ending at each index)';
+      wrapper.appendChild(label);
+      const secondary = document.createElement('div');
+      secondary.className = 'secondary-array-container';
+      secondary.id = 'secondaryContainer';
+      state.dp.forEach((_, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'array-cell';
+        const cellVal = document.createElement('div');
+        cellVal.className = 'cell-value';
+        const cellLabel = document.createElement('div');
+        cellLabel.className = 'cell-label';
+        cellLabel.textContent = `dp[${i}]`;
+        cell.appendChild(cellVal);
+        cell.appendChild(cellLabel);
+        secondary.appendChild(cell);
+        secondaryCells.push({ cell, cellVal });
+      });
+      wrapper.appendChild(secondary);
+    }
+
+    container.appendChild(wrapper);
   }
 
-  // Create wrapper
-  const wrapper = document.createElement('div');
-  wrapper.className = 'vis-wrapper';
-
-  // Primary array
-  const primary = document.createElement('div');
-  primary.className = 'array-container';
-  if (needsSecondary) primary.classList.add('with-secondary');
-
+  // --- IN-PLACE UPDATE: just change classes, heights, values, labels ---
   arr.forEach((val, i) => {
-    const bar = document.createElement('div');
-    bar.className = 'array-bar';
+    if (i >= barElements.length) return;
+    const { bar, valueEl, fillEl, indexEl } = barElements[i];
 
-    // Determine bar class based on algorithm state
+    // Update value and height (triggers CSS transition)
+    valueEl.textContent = val;
+    fillEl.style.height = Math.max(20, (val / maxVal) * maxBarHeight) + 'px';
+
+    // Clear old state classes (keep 'array-bar')
+    bar.className = 'array-bar';
     const barClass = getBarClass(currentAlgo, state, i);
     if (barClass) bar.classList.add(barClass);
 
-    const valueEl = document.createElement('div');
-    valueEl.className = 'bar-value';
-    valueEl.textContent = val;
-
-    const fillEl = document.createElement('div');
-    fillEl.className = 'bar-fill';
-    fillEl.style.height = Math.max(20, (val / maxVal) * maxBarHeight) + 'px';
-
-    const indexEl = document.createElement('div');
-    indexEl.className = 'bar-index';
-    indexEl.textContent = i;
-
-    bar.appendChild(valueEl);
-    bar.appendChild(fillEl);
-    bar.appendChild(indexEl);
-
-    // Add pointer labels
+    // Remove old pointer labels
+    bar.querySelectorAll('.pointer-label').forEach(el => el.remove());
     addPointerLabels(bar, currentAlgo, state, i);
-
-    primary.appendChild(bar);
   });
 
-  wrapper.appendChild(primary);
-
-  // Secondary array for prefix sums
+  // Update secondary cells
   if (currentAlgo === 'prefix-sums' && state.prefix) {
-    const label = document.createElement('div');
-    label.className = 'secondary-label';
-    label.textContent = 'Prefix Sum Array';
-    wrapper.appendChild(label);
-
-    const secondary = document.createElement('div');
-    secondary.className = 'secondary-array-container';
-    state.prefix.forEach((val, i) => {
-      if (i > state.array.length) return;
-      const cell = document.createElement('div');
+    secondaryCells.forEach(({ cell, cellVal }, i) => {
       cell.className = 'array-cell';
       if (i === state.buildIndex) cell.classList.add('active');
       if (i > 0 && i <= state.buildIndex) cell.classList.add('highlight');
-
-      const cellVal = document.createElement('div');
-      cellVal.className = 'cell-value';
-      cellVal.textContent = i <= state.buildIndex ? val : '?';
-
-      const cellLabel = document.createElement('div');
-      cellLabel.className = 'cell-label';
-      cellLabel.textContent = `p[${i}]`;
-
-      cell.appendChild(cellVal);
-      cell.appendChild(cellLabel);
-      secondary.appendChild(cell);
+      cellVal.textContent = i <= state.buildIndex ? state.prefix[i] : '?';
     });
-    wrapper.appendChild(secondary);
   }
 
-  // Secondary array for DP LIS
   if (currentAlgo === 'dp-lis' && state.dp) {
-    const label = document.createElement('div');
-    label.className = 'secondary-label';
-    label.textContent = 'DP Array (LIS length ending at each index)';
-    wrapper.appendChild(label);
-
-    const secondary = document.createElement('div');
-    secondary.className = 'secondary-array-container';
-    state.dp.forEach((val, i) => {
-      const cell = document.createElement('div');
+    secondaryCells.forEach(({ cell, cellVal }, i) => {
       cell.className = 'array-cell';
       if (i === state.i - 1) cell.classList.add('active');
       if (state.lisIndices && state.lisIndices.includes(i)) cell.classList.add('highlight');
-
-      const cellVal = document.createElement('div');
-      cellVal.className = 'cell-value';
-      cellVal.textContent = i < state.i ? val : '?';
-
-      const cellLabel = document.createElement('div');
-      cellLabel.className = 'cell-label';
-      cellLabel.textContent = `dp[${i}]`;
-
-      cell.appendChild(cellVal);
-      cell.appendChild(cellLabel);
-      secondary.appendChild(cell);
+      cellVal.textContent = i < state.i ? state.dp[i] : '?';
     });
-    wrapper.appendChild(secondary);
   }
-
-  container.innerHTML = '';
-  container.appendChild(wrapper);
 }
 
 function getBarClass(algoKey, state, i) {
   switch (algoKey) {
     case 'binary-search':
       if (state.found === i) return 'found';
-      if (state.eliminated.has(i)) return 'eliminated';
       if (i === state.mid) return 'mid';
       if (i === state.lo) return 'lo';
       if (i === state.hi) return 'hi';
+      if (state.eliminated.has(i)) return 'eliminated';
+      if (i >= state.lo && i <= state.hi) return 'active';
       return '';
     case 'two-pointers':
       if (state.found && (i === state.found[0] || i === state.found[1])) return 'found';
