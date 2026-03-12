@@ -126,10 +126,8 @@
         </div>
       </div>
       <div class="nav-links">
+        <a href="#" class="nav-link" id="navAboutLink">About</a>
         <a href="https://github.com/jsamay002/algo-visualizer/" target="_blank" class="nav-link">GitHub</a>
-        <a href="#" class="nav-link" id="toggleSidebar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </a>
       </div>
     </nav>
 
@@ -311,6 +309,90 @@
 
       </main>
     </div>
+  </div>
+
+  <!-- ========== ABOUT PAGE ========== -->
+  <div class="about-page" id="aboutPage" style="display:none;">
+    <div class="landing-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grid-lines"></div>
+    </div>
+    <nav class="landing-nav">
+      <div class="landing-logo" id="aboutBackHome" style="cursor:pointer;">
+        <svg viewBox="0 0 36 36" width="36" height="36">
+          <defs>
+            <linearGradient id="logoGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a855f7" />
+              <stop offset="100%" stop-color="#2dd4bf" />
+            </linearGradient>
+          </defs>
+          <circle cx="18" cy="18" r="16" fill="url(#logoGrad3)" />
+          <path d="M12 22 L18 12 L24 22 Z" fill="white" opacity="0.9" />
+        </svg>
+        <span class="landing-logo-text">CP Algorithm Visualizer</span>
+      </div>
+      <div class="landing-nav-links">
+        <a href="#" id="aboutBackBtn">Back</a>
+      </div>
+    </nav>
+
+    <section class="about-content">
+      <h1 class="about-title">About This Project</h1>
+
+      <div class="about-card">
+        <h2>What is this?</h2>
+        <p>CP Algorithm Visualizer is an interactive tool for understanding competitive programming algorithms. It lets you step through 15 essential techniques one operation at a time, watching pointers move, elements swap, and data structures evolve in real time.</p>
+      </div>
+
+      <div class="about-card">
+        <h2>Who is it for?</h2>
+        <p>Anyone preparing for USACO, Codeforces, or competitive programming in general. Whether you're just starting with Bronze-level sorting or tackling Gold-level graph algorithms and DP, the visualizations help build intuition that's hard to get from reading code alone.</p>
+      </div>
+
+      <div class="about-card">
+        <h2>Features</h2>
+        <ul class="about-list">
+          <li><strong>15 algorithms</strong> across 4 categories: Searching & Arrays, Sorting, Graphs, and Advanced Techniques</li>
+          <li><strong>Step-by-step execution</strong> with smooth animations showing exactly what happens each operation</li>
+          <li><strong>Code highlighting</strong> that follows along with each step in Python, C++, and Java</li>
+          <li><strong>Concept explanations</strong> that break down the core idea before you dive into the visualization</li>
+          <li><strong>Custom inputs</strong> so you can test edge cases and build deeper understanding</li>
+          <li><strong>Complexity analysis</strong> for every algorithm with best, average, worst, and space breakdowns</li>
+        </ul>
+      </div>
+
+      <div class="about-card">
+        <h2>Algorithms Covered</h2>
+        <div class="about-algo-grid">
+          <div class="about-algo-category">
+            <h3>Searching & Arrays</h3>
+            <p>Binary Search, Two Pointers, Prefix Sums, Sliding Window</p>
+          </div>
+          <div class="about-algo-category">
+            <h3>Sorting</h3>
+            <p>Bubble, Selection, Insertion, Merge, Quick Sort</p>
+          </div>
+          <div class="about-algo-category">
+            <h3>Graph Algorithms</h3>
+            <p>BFS, DFS, Dijkstra's, Topological Sort</p>
+          </div>
+          <div class="about-algo-category">
+            <h3>Advanced</h3>
+            <p>Union-Find (DSU), DP: Longest Increasing Subsequence</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <h2>Tech Stack</h2>
+        <p>Pure HTML, CSS, and JavaScript. No frameworks, no dependencies, no build step. Just open and use.</p>
+      </div>
+
+      <div class="about-cta">
+        <button class="btn-hero-primary" id="aboutGetStarted">Start Visualizing</button>
+      </div>
+    </section>
   </div>
 
   <script src="main.js"></script>

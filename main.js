@@ -1536,9 +1536,7 @@ function initApp() {
     btnGetStarted.addEventListener('click', showApp);
   }
   if (btnLearnMore) {
-    btnLearnMore.addEventListener('click', () => {
-      document.querySelector('.features').scrollIntoView({ behavior: 'smooth' });
-    });
+    btnLearnMore.addEventListener('click', () => { showAbout(); });
   }
 
   // Nav brand -> home
@@ -1591,11 +1589,23 @@ function initApp() {
     document.getElementById('speedValue').textContent = slider.value + 'ms';
   });
 
-  // Mobile sidebar toggle
-  document.getElementById('toggleSidebar').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('sidebar').classList.toggle('open');
-  });
+  // About page navigation
+  const navAboutLink = document.getElementById('navAboutLink');
+  if (navAboutLink) {
+    navAboutLink.addEventListener('click', (e) => { e.preventDefault(); showAbout(); });
+  }
+  const aboutBackBtn = document.getElementById('aboutBackBtn');
+  if (aboutBackBtn) {
+    aboutBackBtn.addEventListener('click', (e) => { e.preventDefault(); showAppFromAbout(); });
+  }
+  const aboutBackHome = document.getElementById('aboutBackHome');
+  if (aboutBackHome) {
+    aboutBackHome.addEventListener('click', () => { showLanding(); });
+  }
+  const aboutGetStarted = document.getElementById('aboutGetStarted');
+  if (aboutGetStarted) {
+    aboutGetStarted.addEventListener('click', () => { showAppFromAbout(); });
+  }
 
   // Load default algorithm
   switchAlgorithm('binary-search');
@@ -1603,12 +1613,28 @@ function initApp() {
 
 function showApp() {
   document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('aboutPage').style.display = 'none';
   document.getElementById('appContainer').classList.add('active');
 }
 
 function showLanding() {
   document.getElementById('landingPage').style.display = '';
+  document.getElementById('aboutPage').style.display = 'none';
   document.getElementById('appContainer').classList.remove('active');
+  window.scrollTo(0, 0);
+}
+
+function showAbout() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('appContainer').classList.remove('active');
+  document.getElementById('aboutPage').style.display = '';
+  window.scrollTo(0, 0);
+}
+
+function showAppFromAbout() {
+  document.getElementById('aboutPage').style.display = 'none';
+  document.getElementById('appContainer').classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function switchAlgorithm(key) {
