@@ -2,55 +2,206 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Algorithm Visualizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CP Algorithm Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Algorithm Visualizer</h1>
 
-  <!-- Controls Panel -->
-  <div class="controls">
-    <!-- Algorithm Selector -->
-    <div class="control-group">
-      <label for="algo">Algorithm:</label>
-      <select id="algo">
-        <option value="bubble">Bubble Sort</option>
-        <option value="selection">Selection Sort</option>
-        <option value="insertion">Insertion Sort</option>
-      </select>
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <svg class="nav-logo" viewBox="0 0 32 32" width="32" height="32">
+        <circle cx="16" cy="16" r="14" fill="#6366f1" />
+        <path d="M10 20 L16 10 L22 20 Z" fill="white" />
+      </svg>
+      <div>
+        <span class="nav-title">CP Algorithm Visualizer</span>
+        <span class="nav-subtitle">Interactive Competitive Programming Techniques</span>
+      </div>
     </div>
-
-    <!-- Array Input -->
-    <div class="control-group">
-      <label for="array">Array:</label>
-      <input id="array" placeholder="e.g. 5, 2, 8, 1, 4" />
+    <div class="nav-links">
+      <a href="https://usaco.guide" target="_blank" class="nav-link">USACO Guide</a>
+      <a href="#" class="nav-link" id="toggleSidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </a>
     </div>
+  </nav>
 
-    <!-- Buttons -->
-    <div class="control-group buttons">
-      <button id="start">Start</button>
-      <button id="step">Step</button>
-      <button id="autorun">Auto-Run</button>
-    </div>
+  <!-- Layout Container -->
+  <div class="layout">
 
-    <!-- Speed Input -->
-    <div class="control-group">
-      <label for="speed">Speed (ms):</label>
-      <input type="number" id="speed" value="500" min="50" step="50"/>
-    </div>
-  </div>
+    <!-- Left Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
 
-  <!-- Chart Container -->
-  <div id="visual">
-    <canvas id="chart"></canvas>
-  </div>
+        <div class="sidebar-category">
+          <button class="category-toggle active" data-category="searching">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Searching &amp; Arrays
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="category-items active" id="cat-searching">
+            <a class="algo-link active" data-algo="binary-search">Binary Search</a>
+            <a class="algo-link" data-algo="two-pointers">Two Pointers</a>
+            <a class="algo-link" data-algo="prefix-sums">Prefix Sums</a>
+            <a class="algo-link" data-algo="sliding-window">Sliding Window</a>
+          </div>
+        </div>
 
-  <!-- Algorithm Details -->
-  <div id="details">
-    <h2>Algorithm Details</h2>
-    <pre id="code"></pre>
-    <p id="complexity"></p>
+        <div class="sidebar-category">
+          <button class="category-toggle" data-category="sorting">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
+            Sorting Algorithms
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="category-items" id="cat-sorting">
+            <a class="algo-link" data-algo="bubble-sort">Bubble Sort</a>
+            <a class="algo-link" data-algo="selection-sort">Selection Sort</a>
+            <a class="algo-link" data-algo="insertion-sort">Insertion Sort</a>
+            <a class="algo-link" data-algo="merge-sort">Merge Sort</a>
+            <a class="algo-link" data-algo="quick-sort">Quick Sort</a>
+          </div>
+        </div>
+
+        <div class="sidebar-category">
+          <button class="category-toggle" data-category="graphs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M7.5 7.5L10.5 16M16.5 7.5L13.5 16"/></svg>
+            Graph Algorithms
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="category-items" id="cat-graphs">
+            <a class="algo-link" data-algo="bfs">BFS</a>
+            <a class="algo-link" data-algo="dfs">DFS</a>
+            <a class="algo-link" data-algo="dijkstra">Dijkstra's Algorithm</a>
+            <a class="algo-link" data-algo="topological-sort">Topological Sort</a>
+          </div>
+        </div>
+
+        <div class="sidebar-category">
+          <button class="category-toggle" data-category="advanced">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Advanced Techniques
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="category-items" id="cat-advanced">
+            <a class="algo-link" data-algo="union-find">Union-Find (DSU)</a>
+            <a class="algo-link" data-algo="dp-lis">DP: Longest Increasing Subsequence</a>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Algorithm Header Card -->
+      <div class="algo-card algo-header-card">
+        <div class="algo-header">
+          <div>
+            <h1 class="algo-title" id="algoTitle">Binary Search</h1>
+            <span class="algo-badge" id="algoBadge">Searching &amp; Arrays</span>
+          </div>
+        </div>
+        <p class="algo-description" id="algoDescription">
+          Efficiently finds a target value in a sorted array by repeatedly dividing the search interval in half.
+        </p>
+      </div>
+
+      <!-- Visualization Card -->
+      <div class="algo-card">
+        <h2 class="section-title">Visualization</h2>
+        <div class="visualization-area" id="visualizationArea">
+          <div id="arrayContainer" class="array-container"></div>
+          <div id="graphContainer" class="graph-container"></div>
+          <canvas id="visualCanvas" width="800" height="400" style="display:none;"></canvas>
+        </div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="status-bar" id="statusBar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <span id="statusText">Click "Initialize" to set up the algorithm, then step through or auto-run.</span>
+      </div>
+
+      <!-- Controls Card -->
+      <div class="algo-card controls-card">
+        <div class="controls-bar">
+          <div class="control-group">
+            <label for="inputField">Input:</label>
+            <input type="text" id="inputField" placeholder="e.g. 1,3,5,7,9,11,13" />
+          </div>
+          <div class="control-group" id="targetGroup">
+            <label for="targetField">Target:</label>
+            <input type="number" id="targetField" placeholder="13" />
+          </div>
+          <div class="control-group" id="windowGroup" style="display:none;">
+            <label for="windowField">Window Size:</label>
+            <input type="number" id="windowField" value="3" min="1" />
+          </div>
+          <div class="control-group">
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" min="50" max="2000" value="500" step="50" />
+            <span id="speedValue">500ms</span>
+          </div>
+        </div>
+        <div class="controls-buttons">
+          <button class="btn btn-primary" id="btnInit">Initialize</button>
+          <button class="btn btn-secondary" id="btnStep" disabled>Step</button>
+          <button class="btn btn-success" id="btnAutoRun" disabled>Auto-Run</button>
+          <button class="btn btn-danger" id="btnReset">Reset</button>
+        </div>
+      </div>
+
+      <!-- Complexity Card -->
+      <div class="algo-card">
+        <h2 class="section-title">Complexity Analysis</h2>
+        <div class="complexity-grid" id="complexityGrid">
+          <div class="complexity-item">
+            <span class="complexity-label">Best Case</span>
+            <span class="complexity-value" id="complexBest">O(1)</span>
+          </div>
+          <div class="complexity-item">
+            <span class="complexity-label">Average Case</span>
+            <span class="complexity-value" id="complexAvg">O(log n)</span>
+          </div>
+          <div class="complexity-item">
+            <span class="complexity-label">Worst Case</span>
+            <span class="complexity-value" id="complexWorst">O(log n)</span>
+          </div>
+          <div class="complexity-item">
+            <span class="complexity-label">Space</span>
+            <span class="complexity-value" id="complexSpace">O(1)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Section -->
+      <div class="algo-card">
+        <h2 class="section-title">Implementation</h2>
+        <div class="code-tabs">
+          <button class="tab-btn active" data-lang="python">Python</button>
+          <button class="tab-btn" data-lang="cpp">C++</button>
+          <button class="tab-btn" data-lang="java">Java</button>
+        </div>
+        <div class="code-block-wrapper">
+          <pre class="code-block" id="codeBlockPython"><code id="pythonCode"></code></pre>
+          <pre class="code-block" id="codeBlockCpp" style="display:none;"><code id="cppCode"></code></pre>
+          <pre class="code-block" id="codeBlockJava" style="display:none;"><code id="javaCode"></code></pre>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>Built for the USACO &amp; Competitive Programming community</p>
+        <p class="footer-sub">Visualize. Understand. Compete.</p>
+      </footer>
+
+    </main>
   </div>
 
   <script src="main.js"></script>
