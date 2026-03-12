@@ -1386,10 +1386,142 @@ function find(parent, x) {
 }
 
 // ============================================================
+// CODE HIGHLIGHT DEFINITIONS
+// Maps algorithm state to which code lines to highlight
+// ============================================================
+
+const codeHighlights = {
+  'binary-search': {
+    getHighlight(state) {
+      if (state.done && state.found >= 0) return { lines: [5, 6], explanation: 'The middle element matches the target! Return the index.' };
+      if (state.done) return { lines: [11], explanation: 'The search space is empty (lo > hi). Target not found, return -1.' };
+      if (state.mid >= 0 && state.array[state.mid] < state.target) return { lines: [4, 7, 8], explanation: `Computing mid = ${state.mid}. Since arr[mid] < target, we discard the left half and set lo = mid + 1.` };
+      if (state.mid >= 0 && state.array[state.mid] > state.target) return { lines: [4, 9, 10], explanation: `Computing mid = ${state.mid}. Since arr[mid] > target, we discard the right half and set hi = mid - 1.` };
+      return { lines: [2, 3], explanation: 'Initialize lo and hi pointers, then enter the while loop.' };
+    }
+  },
+  'two-pointers': {
+    getHighlight(state) {
+      if (state.done && state.found) return { lines: [5, 6], explanation: 'Sum equals target! Return the pair of indices.' };
+      if (state.done) return { lines: [11], explanation: 'Pointers crossed without finding a pair. Return (-1, -1).' };
+      const sum = state.array[state.left] + state.array[state.right];
+      if (sum < state.target) return { lines: [7, 8], explanation: `Sum ${sum} < ${state.target}. Move left pointer right to increase the sum.` };
+      return { lines: [9, 10], explanation: `Sum ${sum} > ${state.target}. Move right pointer left to decrease the sum.` };
+    }
+  },
+  'prefix-sums': {
+    getHighlight(state) {
+      if (state.done) return { lines: [6, 7, 8], explanation: 'Prefix array complete! Range sum query: sum(l..r) = prefix[r+1] - prefix[l].' };
+      return { lines: [4, 5], explanation: `Building prefix sum: prefix[${state.buildIndex}] = prefix[${state.buildIndex - 1}] + arr[${state.buildIndex - 1}].` };
+    }
+  },
+  'sliding-window': {
+    getHighlight(state) {
+      if (state.done) return { lines: [8, 9], explanation: `Window traversal complete. Maximum sum found: ${state.maxSum}.` };
+      if (state.phase === 'init') return { lines: [4, 5, 6], explanation: 'Computing the sum of the initial window of size k.' };
+      return { lines: [8, 9], explanation: 'Slide window: add the new element, remove the oldest, update max.' };
+    }
+  },
+  'bubble-sort': {
+    getHighlight(state) {
+      if (state.done) return { lines: [1, 2], explanation: 'All passes complete. The array is sorted!' };
+      if (state.comparing[0] >= 0) return { lines: [4, 5, 6], explanation: `Comparing adjacent elements at indices ${state.comparing[0]} and ${state.comparing[1]}. Swap if out of order.` };
+      return { lines: [3], explanation: `Starting pass ${state.i + 1}. Each pass bubbles the largest unsorted element to its final position.` };
+    }
+  },
+  'selection-sort': {
+    getHighlight(state) {
+      if (state.done) return { lines: [1], explanation: 'Selection sort complete. Array is sorted!' };
+      if (state.phase === 'swap') return { lines: [6], explanation: `Swap the minimum element (${state.array[state.minIdx]}) with position ${state.i}.` };
+      return { lines: [3, 4, 5], explanation: `Scanning unsorted portion to find the minimum element.` };
+    }
+  },
+  'insertion-sort': {
+    getHighlight(state) {
+      if (state.done) return { lines: [1], explanation: 'Insertion sort complete. Array is sorted!' };
+      return { lines: [2, 3, 4, 5, 6, 7], explanation: `Take element at index ${state.i - 1}, shift larger elements right, insert at correct position.` };
+    }
+  },
+  'merge-sort': {
+    getHighlight(state) {
+      if (state.done) return { lines: [1, 2, 3], explanation: 'All subarrays merged. Array is fully sorted!' };
+      if (state.mergeHighlight) {
+        const { left, mid, right } = state.mergeHighlight;
+        return { lines: [6, 7, 8, 9, 10], explanation: `Merging subarrays [${left}..${mid}] and [${mid+1}..${right}]. Compare heads, take smaller.` };
+      }
+      return { lines: [4, 5], explanation: 'Dividing array into subarrays for merging.' };
+    }
+  },
+  'quick-sort': {
+    getHighlight(state) {
+      if (state.done) return { lines: [1, 2, 3], explanation: 'All partitions sorted. Array is complete!' };
+      if (state.currentPartition) return { lines: [6, 7, 8, 9, 10, 11], explanation: `Lomuto partition: pivot = ${state.array[state.currentPartition.pivot]}. Elements <= pivot go left, > pivot go right.` };
+      return { lines: [1, 2, 3], explanation: 'Selecting pivot and partitioning the subarray.' };
+    }
+  },
+  'bfs': {
+    getHighlight(state) {
+      if (state.done) return { lines: [11, 12], explanation: `BFS complete! All reachable nodes visited in level order: ${state.order.join(' → ')}` };
+      return { lines: [8, 9, 10, 11, 12, 13, 14], explanation: `Dequeue node ${state.current}. Enqueue all unvisited neighbors into the queue.` };
+    }
+  },
+  'dfs': {
+    getHighlight(state) {
+      if (state.done) return { lines: [1, 2], explanation: `DFS complete! Traversal order: ${state.order.join(' → ')}` };
+      return { lines: [3, 4, 5, 6, 7], explanation: `Visit node ${state.current}. Mark as visited, then recurse on each unvisited neighbor.` };
+    }
+  },
+  'dijkstra': {
+    getHighlight(state) {
+      if (state.done) return { lines: [3, 4], explanation: `Dijkstra complete! Shortest distances from source computed.` };
+      return { lines: [7, 8, 9, 10, 11], explanation: `Process node ${state.current} (dist=${state.dist[state.current]}). Relax all outgoing edges if shorter path found.` };
+    }
+  },
+  'topological-sort': {
+    getHighlight(state) {
+      if (state.done) return { lines: [8, 9], explanation: `Topological order found: ${state.order.join(' → ')}` };
+      return { lines: [10, 11, 12, 13, 14], explanation: `Dequeue node ${state.current} (in-degree 0). Decrement in-degree of neighbors. Enqueue any new zero in-degree nodes.` };
+    }
+  },
+  'union-find': {
+    getHighlight(state) {
+      if (state.done) return { lines: [4, 5, 6], explanation: 'All union operations complete! Path compression keeps the tree flat.' };
+      return { lines: [8, 9, 10, 11, 12, 13, 14], explanation: `Union by rank: find roots of both elements, attach smaller tree under larger. Increment rank if equal.` };
+    }
+  },
+  'dp-lis': {
+    getHighlight(state) {
+      if (state.done) return { lines: [3, 4], explanation: `DP complete! LIS length = ${Math.max(...state.dp)}. dp[i] = length of LIS ending at index i.` };
+      return { lines: [5, 6, 7], explanation: `For each j < ${state.i - 1} where arr[j] < arr[${state.i - 1}], set dp[${state.i - 1}] = max(dp[${state.i - 1}], dp[j] + 1).` };
+    }
+  }
+};
+
+// ============================================================
 // UI CONTROLLER
 // ============================================================
 
+let currentActiveLang = 'python';
+
 function initApp() {
+  // Landing page buttons
+  const btnGetStarted = document.getElementById('btnGetStarted');
+  const btnLearnMore = document.getElementById('btnLearnMore');
+  if (btnGetStarted) {
+    btnGetStarted.addEventListener('click', showApp);
+  }
+  if (btnLearnMore) {
+    btnLearnMore.addEventListener('click', () => {
+      document.querySelector('.features').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  // Nav brand -> home
+  const navHome = document.getElementById('navBrandHome');
+  if (navHome) {
+    navHome.addEventListener('click', showLanding);
+  }
+
   // Sidebar navigation
   document.querySelectorAll('.category-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1413,10 +1545,12 @@ function initApp() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const lang = btn.dataset.lang;
-      document.getElementById('codeBlockPython').style.display = lang === 'python' ? '' : 'none';
-      document.getElementById('codeBlockCpp').style.display = lang === 'cpp' ? '' : 'none';
-      document.getElementById('codeBlockJava').style.display = lang === 'java' ? '' : 'none';
+      currentActiveLang = btn.dataset.lang;
+      document.getElementById('codeBlockPython').style.display = currentActiveLang === 'python' ? '' : 'none';
+      document.getElementById('codeBlockCpp').style.display = currentActiveLang === 'cpp' ? '' : 'none';
+      document.getElementById('codeBlockJava').style.display = currentActiveLang === 'java' ? '' : 'none';
+      // Re-render code with highlights if active
+      if (isInitialized) renderCodeWithHighlights();
     });
   });
 
@@ -1442,6 +1576,16 @@ function initApp() {
   switchAlgorithm('binary-search');
 }
 
+function showApp() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('appContainer').classList.add('active');
+}
+
+function showLanding() {
+  document.getElementById('landingPage').style.display = '';
+  document.getElementById('appContainer').classList.remove('active');
+}
+
 function switchAlgorithm(key) {
   stopAutoRun();
   currentAlgo = key;
@@ -1462,10 +1606,14 @@ function switchAlgorithm(key) {
   document.getElementById('complexWorst').textContent = algo.complexity.worst;
   document.getElementById('complexSpace').textContent = algo.complexity.space;
 
-  // Update code
-  document.getElementById('pythonCode').textContent = algo.python;
-  document.getElementById('cppCode').textContent = algo.cpp;
-  document.getElementById('javaCode').textContent = algo.java;
+  // Update code with line numbers
+  renderCodeBlock('pythonCode', algo.python);
+  renderCodeBlock('cppCode', algo.cpp);
+  renderCodeBlock('javaCode', algo.java);
+
+  // Clear explanation
+  const explEl = document.getElementById('codeExplanation');
+  if (explEl) { explEl.classList.remove('visible'); explEl.textContent = ''; }
 
   // Update input controls
   const inputField = document.getElementById('inputField');
@@ -1553,6 +1701,7 @@ function initializeAlgorithm() {
   document.getElementById('btnAutoRun').disabled = false;
 
   renderVisualization();
+  renderCodeWithHighlights();
   updateStatus('Initialized! Click "Step" to advance or "Auto-Run" to animate.');
 }
 
@@ -1561,6 +1710,7 @@ function performStep() {
   const algo = algorithmData[currentAlgo];
   const result = algo.step.call(algo, algoState);
   renderVisualization();
+  renderCodeWithHighlights();
   updateStatus(result.description, result.done ? 'success' : '');
   if (result.done) {
     document.getElementById('btnStep').disabled = true;
@@ -1617,6 +1767,48 @@ function clearVisualization() {
   document.getElementById('arrayContainer').style.display = 'none';
   document.getElementById('graphContainer').innerHTML = '';
   document.getElementById('graphContainer').style.display = 'none';
+}
+
+// ============================================================
+// CODE RENDERING WITH LINE NUMBERS & HIGHLIGHTS
+// ============================================================
+
+function renderCodeBlock(elementId, codeStr, highlightedLines) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const lines = codeStr.split('\n');
+  // Remove leading empty line if present
+  if (lines[0].trim() === '') lines.shift();
+  const hl = new Set(highlightedLines || []);
+  el.innerHTML = lines.map((line, i) => {
+    const lineNum = i + 1;
+    const isHighlighted = hl.has(lineNum) ? ' highlighted' : '';
+    return `<span class="code-line${isHighlighted}"><span class="line-number">${lineNum}</span><span class="line-content">${escapeHtml(line)}</span></span>`;
+  }).join('\n');
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderCodeWithHighlights() {
+  if (!algoState || !currentAlgo) return;
+  const highlightDef = codeHighlights[currentAlgo];
+  if (!highlightDef) return;
+  const { lines, explanation } = highlightDef.getHighlight(algoState);
+  const algo = algorithmData[currentAlgo];
+
+  // Re-render the active code block with highlights
+  if (currentActiveLang === 'python') renderCodeBlock('pythonCode', algo.python, lines);
+  else if (currentActiveLang === 'cpp') renderCodeBlock('cppCode', algo.cpp, lines);
+  else if (currentActiveLang === 'java') renderCodeBlock('javaCode', algo.java, lines);
+
+  // Show explanation
+  const explEl = document.getElementById('codeExplanation');
+  if (explEl && explanation) {
+    explEl.innerHTML = `<strong>Step:</strong> ${explanation}`;
+    explEl.classList.add('visible');
+  }
 }
 
 // ============================================================
