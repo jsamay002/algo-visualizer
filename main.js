@@ -2377,13 +2377,18 @@ function renderDSU() {
   opList.style.fontSize = '13px';
   opList.style.color = 'var(--text-secondary)';
 
-  let opHtml = '<strong>Operations:</strong> ';
+  opList.textContent = '';
+  const label = document.createElement('strong');
+  label.textContent = 'Operations: ';
+  opList.appendChild(label);
   state.operations.forEach((op, i) => {
-    const style = i < state.opIdx ? 'color: var(--success); font-weight: 600;' : i === state.opIdx ? 'color: var(--warning); font-weight: 600;' : '';
-    opHtml += `<span style="${style}">union(${op[0]},${op[1]})</span>`;
-    if (i < state.operations.length - 1) opHtml += ' → ';
+    const span = document.createElement('span');
+    if (i < state.opIdx) { span.style.color = 'var(--success)'; span.style.fontWeight = '600'; }
+    else if (i === state.opIdx) { span.style.color = 'var(--warning)'; span.style.fontWeight = '600'; }
+    span.textContent = `union(${op[0]},${op[1]})`;
+    opList.appendChild(span);
+    if (i < state.operations.length - 1) opList.appendChild(document.createTextNode(' → '));
   });
-  opList.innerHTML = opHtml;
 
   container.appendChild(dsuContainer);
   container.appendChild(opList);
